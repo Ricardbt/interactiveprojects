@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mandala Sketch</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* Prevents scrollbars */
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    let numPetals = 12;   // Number of petals in the mandala
+    let petalLength = 100;  // Length of each petal
+    let petalWidth = 20;    // Width of each petal
+    const angleOffset = 0.01;  // Angle offset between petals
+    const rotationSpeed = 0.0013; // Speed of rotation
+
+    function setup() {
+        createCanvas(800, 800);
+        background(205, 210, 96);
+        noFill();
+        stroke(0);
+        smooth();
+    }
+
+    function draw() {
+        stroke(10 + (mouseX / 2), 75, 155 - (mouseY / 18));
+        numPetals = Math.max(7, 12 + Math.floor(mouseX / 50)); // Ensure at least 6 petals
+        petalLength = Math.max(60, 60 + mouseY); // Ensure length is at least 60
+        petalWidth = Math.max(30, 30 + Math.floor(mouseY / 20)); // Ensure width is at least 30
+
+        translate(width / 2, height / 2); // Move the origin to the center of the canvas
+        rotateFrame(frameCount * rotationSpeed); // Rotate the frame
+
+        let petalGap = TWO_PI / numPetals;
+        for (let i = 0; i < numPetals; i++) {
+            drawPetal(petalLength, petalWidth);
+            rotate(petalGap);
+        }
+    }
+
+    function drawPetal(len, w) {
+        beginShape();
+        for (let angle = -PI / 2; angle <= PI / 2; angle += angleOffset) {
+            let x = len * cos(angle);
+            let y = w * sin(angle);
+            vertex(x, y);
+        }
+        for (let angle = PI / 2; angle >= -PI / 2; angle -= angleOffset) {
+            let x = len * cos(angle);
+            let y = -w * sin(angle);
+            vertex(x, y);
+        }
+        endShape(CLOSE);
+    }
+
+    function rotateFrame(angle) {
+        applyMatrix(cos(angle), -sin(angle), 0, sin(angle), cos(angle), 0);
+    }
+
+    function keyPressed() {
+        if (key === ' ') {
+            // Change the background color when spacebar is pressed
+            background(205, 210, 96);
+        }
+    }
+</script>
+
+</body>
+</html>

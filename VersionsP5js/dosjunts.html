@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiple p5.js Sketches</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.0/p5.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden; /* Prevents scrollbars */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        canvas {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+    // First sketch variables
+    let a, b, c, d, n, x, y, yn, xn, z;
+
+    function firstSketch(p) {
+        p.setup = function () {
+            a = 0.970;
+            b = -1.899;
+            c = 1.381;
+            d = -1.506;
+            z = 20;
+            xn = 500;
+            yn = 300;
+            p.createCanvas(600, 600, p.WEBGL); // Set canvas size to 600x600
+            p.background(240, 240, 240); // Light grey background
+            p.noFill();
+        };
+
+        p.draw = function () {
+            // Stroke color: light blue
+            p.stroke(100, 150, 255);
+            p.translate(0, 0);
+            x = (p.sin(a * yn) + c * p.cos(a * xn)) * 120;
+            y = (p.sin(b * xn) + d * p.cos(b * yn)) * 120;
+            z += 0.5;
+            p.ellipse(x, y, 2, 2);
+            p.rotateY(p.radians(z));
+            p.stroke(x, y, z);
+            p.beginShape();
+            for (let t = 0; t <= 120; t += 5) {
+                p.vertex(x + t, y + t);
+                for (let s = 0; s <= 120; s += 4) {
+                    p.vertex(s, t);
+                }
+            }
+            p.endShape();
+            xn += 0.015;
+            yn += 0.015;
+        };
+    }
+
+    // Second sketch variables
+    let numPetals = 12;   // Number of petals in the mandala
+    let petalLength = 100;  // Length of each petal
+    let petalWidth = 20;    // Width of each petal
+    const angleOffset = 0.01;  // Angle offset between petals
+    const rotationSpeed = 0.0013; // Speed of rotation
+
+    function secondSketch(p) {
+        p.setup = function () {
+            p.createCanvas(600, 600); // Set canvas size to 600x600
+            p.background(240, 240, 240); // Light grey background
+            p.noFill();
+            p.stroke(0);
+            p.smooth();
+        };
+
+        p.draw = function () {
+            // Stroke color: light blue with a gradient based on mouse position
+            p.stroke(100 + (p.mouseX / 5), 150, 255 - (p.mouseY / 10));
+            numPetals = Math.max(6, 6 + Math.floor(p.mouseX / 40)); // Ensure at least 6 petals
+            petalLength = Math.max(60, 60 + p.mouseY); // Ensure length is at least 60
+            petalWidth = Math.max(30, 30 + Math.floor(p.mouseY / 20)); // Ensure width is at least 30
+
+            p.translate(p.width / 2, p.height / 2); // Move the origin to the center of the canvas
+            rotateFrame(p.frameCount * rotationSpeed); // Rotate the frame
+
+            let petalGap = p.TWO_PI / numPetals;
+            for (let i = 0; i < numPetals; i++) {
+                drawPetal(p, petalLength, petalWidth);
+                p.rotate(petalGap);
+            }
+        };
+
+        function drawPetal(p, len, w) {
+            p.beginShape();
+            for (let angle = -p.PI / 2; angle <= p.PI / 2; angle += angleOffset) {
+                let x = len * p.cos(angle);
+                let y = w * p.sin(angle);
+                p.vertex(x, y);
+            }
+            for (let angle = p.PI / 2; angle >= -p.PI / 2; angle -= angleOffset) {
+                let x = len * p.cos(angle);
+                let y = -w * p.sin(angle);
+                p.vertex(x, y);
+            }
+            p.endShape(p.CLOSE);
+        }
+
+        function rotateFrame(angle) {
+            p.applyMatrix(p.cos(angle), -p.sin(angle), 0, p.sin(angle), p.cos(angle), 0);
+        }
+
+        p.keyPressed = function () {
+            if (p.key === ' ') {
+                // Change the background color when spacebar is pressed
+                p.background(240, 240, 240); // Light grey background
+            }
+        };
+    }
+
+    // Create both p5.js sketches
+    new p5(firstSketch);
+    new p5(secondSketch);
+</script>
+
+</body>
+</html>
